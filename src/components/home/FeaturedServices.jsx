@@ -7,6 +7,7 @@ import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import ServiceCard from "@/components/services/ServiceCard";
 import ServiceCardSkeleton from "@/components/services/ServiceCardSkeleton";
+import Reveal from "@/components/shared/Reveal";
 
 export default function FeaturedServices() {
   const [state, setState] = useState({
@@ -94,8 +95,10 @@ export default function FeaturedServices() {
 
         {!loading && !error && services.length > 0 && (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service) => (
-              <ServiceCard key={service._id} service={service} />
+            {services.map((service, index) => (
+              <Reveal key={service._id} delay={index * 0.08} className="h-full">
+                <ServiceCard service={service} />
+              </Reveal>
             ))}
           </div>
         )}
