@@ -1,10 +1,14 @@
 import ProtectedArea from "@/components/auth/ProtectedArea";
-import PlaceholderPage from "@/components/shared/PlaceholderPage";
+import ServiceDetails from "@/components/services/ServiceDetails";
 
-export default function Page() {
+export const metadata = {
+  title: "Service Details | WedPlan",
+};
+
+export default function ServiceDetailsPage() {
   return (
     <ProtectedArea>
-      <PlaceholderPage title="Service Details" />
+      <ServiceDetails />
     </ProtectedArea>
   );
 }
