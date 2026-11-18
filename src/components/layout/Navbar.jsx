@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Heart, LayoutDashboard, LogOut, Menu, Settings } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -43,17 +45,6 @@ const roleLinks = {
   },
 };
 
-// TEMPORARY: design testing only.
-// true  -> logged-in navbar (change role to "admin" | "vendor" | "customer")
-// false -> logged-out navbar
-const IS_LOGGED_IN = true;
-const MOCK_USER = {
-  name: "Rahim Uddin",
-  email: "rahim@gmail.com",
-  image: "",
-  role: "vendor",
-};
-
 function getInitials(name = "") {
   return name
     .split(" ")
@@ -66,9 +57,13 @@ function getInitials(name = "") {
 function UserAvatar({ user, className }) {
   return (
     <Avatar className={className}>
-      <AvatarImage src={user.image} alt={user.name} />
+      <AvatarImage
+        src={user?.image || undefined}
+        alt={user?.name || "User"}
+        referrerPolicy="no-referrer"
+      />
       <AvatarFallback className="bg-primary/10 text-primary">
-        {getInitials(user.name)}
+        {getInitials(user?.name)}
       </AvatarFallback>
     </Avatar>
   );
@@ -76,11 +71,13 @@ function UserAvatar({ user, className }) {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  // Later this will come from Better Auth (useSession)
-  const user = IS_LOGGED_IN ? MOCK_USER : null;
-  const links = user ? roleLinks[user.role] : null;
+  // Real session from Better Auth. It updates automatically on sign in / sign out.
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user ?? null;
+  const links = user ? roleLinks[user.role] ?? roleLinks.customer : null;
 
   const linkClass = (href) =>
     `text-sm font-medium transition-colors hover:text-primary ${
@@ -89,11 +86,19 @@ export default function Navbar() {
 
   const closeMenu = () => setOpen(false);
 
-  const handleLogout = () => {
-    // Later: call Better Auth signOut here
+  const handleLogout = async () => {
     closeMenu();
+    const { error } = await authClient.signOut();
+    if (error) {
+      toast.error(error.message || "Logout failed. Please try again.");
+      return;
+    }
     toast.success("Logged out successfully");
+    router.push("/");
+    router.refresh();
   };
+
+  console.log(user);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur">
@@ -121,10 +126,12 @@ export default function Navbar() {
 
         {/* Desktop right side */}
         <div className="hidden items-center gap-3 md:flex">
-          {user ? (
+          {isPending ? (
+            <Skeleton className="h-11 w-40 rounded-full" />
+          ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 rounded-full border-2 p-1 pr-3 outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                <UserAvatar user={user} className="h-9 w-9 " />
+                <UserAvatar user={user} className="h-9 w-9" />
                 <div className="min-w-0 text-left">
                   <span className="block max-w-32 truncate text-sm font-semibold">
                     {user.name}
@@ -137,8 +144,8 @@ export default function Navbar() {
               <DropdownMenuContent align="end" className="w-56">
                 <div className="flex items-center gap-3 px-2 py-2">
                   <UserAvatar user={user} className="h-10 w-10" />
-                  <p className="truncate text-sm text-gray-600 font-semibold">
-                    {user?.email}
+                  <p className="truncate text-sm font-semibold text-gray-600">
+                    {user.email}
                   </p>
                 </div>
                 <DropdownMenuSeparator />
@@ -194,9 +201,14 @@ export default function Navbar() {
                 {user && (
                   <div className="flex items-center gap-3 rounded-lg bg-secondary/60 p-3">
                     <UserAvatar user={user} className="h-11 w-11" />
-                    <p className="truncate text-sm font-semibold">
-                      {user.name}
-                    </p>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">
+                        {user.name}
+                      </p>
+                      <p className="text-xs font-medium capitalize text-primary">
+                        {user.role}
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -213,7 +225,12 @@ export default function Navbar() {
 
                 <hr />
 
-                {user ? (
+                {isPending ? (
+                  <div className="space-y-3">
+                    <Skeleton className="h-9 w-full" />
+                    <Skeleton className="h-9 w-full" />
+                  </div>
+                ) : user ? (
                   <>
                     <Link
                       href={links.dashboard}
