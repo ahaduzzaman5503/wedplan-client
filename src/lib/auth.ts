@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { MongoClient } from "mongodb";
+import { jwt } from "better-auth/plugins";
 
 // Reuse one Mongo client while developing (avoids many connections on hot reload)
 const globalForMongo = globalThis;
@@ -74,5 +75,5 @@ export const auth = betterAuth({
     },
   },
 
-  plugins: [nextCookies()], // must be the last plugin
+  plugins: [jwt(), nextCookies()], // nextCookies must stay last
 });

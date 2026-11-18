@@ -1,10 +1,6 @@
 import { createAuthClient } from "better-auth/react";
+import { jwtClient } from "better-auth/client/plugins";
 
-export const authClient = createAuthClient();
-
-
-const signIn = async () => {
-  const data = await authClient.signIn.social({
-    provider: "google",
-  });
-};
+export const authClient = createAuthClient({
+  plugins: [jwtClient()],
+});
