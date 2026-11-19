@@ -13,9 +13,20 @@ if (process.env.NODE_ENV !== "production") {
   globalForMongo._wedplanMongoClient = client;
 }
 const db = client.db(process.env.MONGODB_DB);
+const isProduction = process.env.NODE_ENV === "production";
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, { client }),
+
+  advanced: {
+    useSecureCookies: isProduction,
+    defaultCookieAttributes: {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "lax",
+      path: "/",
+    },
+  },
 
   emailAndPassword: {
     enabled: true,
