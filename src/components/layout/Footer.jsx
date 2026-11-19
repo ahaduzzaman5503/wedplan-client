@@ -48,6 +48,8 @@ const socialLinks = [
   { href: "https://x.com", label: "X (Twitter)", icon: <XIcon /> },
 ];
 
+const COPYRIGHT_YEAR = 2026;
+
 export default function Footer() {
   return (
     <footer className="border-t bg-secondary/50">
@@ -138,7 +140,7 @@ export default function Footer() {
       {/* Copyright */}
       <div className="border-t">
         <p className="mx-auto max-w-7xl px-4 py-5 text-center text-sm text-muted-foreground sm:px-6 lg:px-8">
-          &copy; {new Date().getFullYear()} WedPlan. All rights reserved.
+          &copy; {COPYRIGHT_YEAR} WedPlan. All rights reserved.
         </p>
       </div>
     </footer>
