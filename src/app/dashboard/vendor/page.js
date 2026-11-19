@@ -1,5 +1,10 @@
-import PlaceholderPage from "@/components/shared/PlaceholderPage";
+import VendorOverview from "@/components/dashboard/vendor/VendorOverview";
 
-export default function Page() {
-  return <PlaceholderPage title="Vendor Overview" />;
+export const metadata = {
+  title: "Vendor Dashboard | WedPlan",
+};
+
+export default function VendorDashboardPage() {
+  return <VendorOverview />;
 }
+

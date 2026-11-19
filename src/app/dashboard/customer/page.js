@@ -1,5 +1,11 @@
-import PlaceholderPage from "@/components/shared/PlaceholderPage";
+import CustomerOverview from "@/components/dashboard/customer/CustomerOverview";
 
-export default function Page() {
-  return <PlaceholderPage title="Customer Overview" />;
+export const metadata = {
+  title: "Customer Dashboard | WedPlan",
+};
+
+export default function CustomerDashboardPage() {
+  return <CustomerOverview />;
 }
+
+
