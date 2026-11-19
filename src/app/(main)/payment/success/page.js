@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import ProtectedArea from "@/components/auth/ProtectedArea";
+import PaymentStatus from "@/components/payment/PaymentStatus";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
@@ -16,13 +17,12 @@ export default function PaymentSuccessPage() {
           Payment received
         </h1>
         <p className="mt-3 text-muted-foreground">
-          Thank you! Stripe is confirming your payment. Your Premium plan is
-          activated automatically once the payment is verified, which usually
-          takes a few seconds.
+          Thank you! Your Premium plan is activated as soon as Stripe verifies
+          the payment.
         </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Check your Subscription page to see your current plan.
-        </p>
+
+        <PaymentStatus />
+
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button
             nativeButton={false}
@@ -42,5 +42,7 @@ export default function PaymentSuccessPage() {
     </ProtectedArea>
   );
 }
+
+
 
 
