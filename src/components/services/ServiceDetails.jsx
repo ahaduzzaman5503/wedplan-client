@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import UserAvatar from "@/components/shared/UserAvatar";
 import ServiceGallery from "@/components/services/ServiceGallery";
+import BookingDialog from "@/components/services/BookingDialog";
 
 function DetailsSkeleton() {
   return (
@@ -75,13 +76,7 @@ function BookingPanel({ service, user, sessionPending }) {
   }
 
   return (
-    <Button
-      className="w-full"
-      size="lg"
-      onClick={() => toast.info("The booking form will be added in the next steps")}
-    >
-      Request Booking
-    </Button>
+      <BookingDialog service={service} />
   );
 }
 
