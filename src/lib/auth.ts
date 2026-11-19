@@ -1,8 +1,9 @@
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
-import { mongodbAdapter } from "@better-auth/mongo-adapter";
-import { MongoClient } from "mongodb";
 import { jwt } from "better-auth/plugins";
+import { mongodbAdapter } from "@better-auth/mongo-adapter";
+import { MongoClient, ObjectId } from "mongodb";
+import { APIError } from "better-auth/api";
 
 // Reuse one Mongo client while developing (avoids many connections on hot reload)
 const globalForMongo = globalThis;
@@ -21,11 +22,11 @@ export const auth = betterAuth({
     minPasswordLength: 6,
   },
 
-    socialProviders: {
-        google: { 
-            clientId: process.env.GOOGLE_CLIENT_ID as string, 
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
-        }, 
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    },
   },
 
   user: {
@@ -60,8 +61,23 @@ export const auth = betterAuth({
         required: false,
         input: false,
       },
+      // Edited through our own Express endpoint (PATCH /api/profile)
+      phone: {
+        type: "string",
+        required: false,
+        input: false,
+      },
+      address: {
+        type: "string",
+        required: false,
+        input: false,
+      },
     },
   },
+
+  // Profile updates go through Express (PATCH /api/profile) with a field whitelist.
+  // This turns off the built-in endpoint so nobody can change their own role.
+  disabledPaths: ["/update-user"],
 
   databaseHooks: {
     user: {
@@ -73,7 +89,25 @@ export const auth = betterAuth({
         },
       },
     },
+    session: {
+      create: {
+        before: async (session) => {
+          // Blocked users cannot start a new session (sign in)
+          if (ObjectId.isValid(session.userId)) {
+            const user = await db
+              .collection("user")
+              .findOne({ _id: new ObjectId(session.userId) });
+            if (user?.isBlocked) {
+              throw new APIError("FORBIDDEN", {
+                message: "Your account has been blocked. Please contact support.",
+              });
+            }
+          }
+        },
+      },
+    },
   },
 
   plugins: [jwt(), nextCookies()], // nextCookies must stay last
 });
+

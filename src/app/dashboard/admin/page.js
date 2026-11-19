@@ -1,5 +1,9 @@
-import PlaceholderPage from "@/components/shared/PlaceholderPage";
+import AdminOverview from "@/components/dashboard/admin/AdminOverview";
 
-export default function Page() {
-  return <PlaceholderPage title="Admin Overview" />;
+export const metadata = {
+  title: "Admin Dashboard | WedPlan",
+};
+
+export default function AdminDashboardPage() {
+  return <AdminOverview />;
 }
