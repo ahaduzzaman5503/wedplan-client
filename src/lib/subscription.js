@@ -1,3 +1,4 @@
+export const PREMIUM_PRICE_CENTS = 999;
 export const FREE_PLAN_ACTIVE_LIMIT = 3;
 
 // Premium only counts while it has not expired
