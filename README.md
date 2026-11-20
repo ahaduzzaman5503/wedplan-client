@@ -4,9 +4,9 @@ WedPlan is a full-stack wedding planning platform that connects customers with w
 
 This repository contains the Next.js client application.
 
-## Live Website
+## Live Website : https://wedplan-clientt.vercel.app/
 
-Live deployment: **Add the production client URL here**
+Live deployment: **https://wedplan-clientt.vercel.app/**
 
 ## Repositories
 
