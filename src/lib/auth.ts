@@ -3,8 +3,7 @@ import { nextCookies } from "better-auth/next-js";
 import { jwt } from "better-auth/plugins";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { MongoClient, ObjectId } from "mongodb";
-import { APIError } from "better-auth/api";
-
+import { APIError, createAuthMiddleware } from "better-auth/api";
 // Reuse one Mongo client while developing (avoids many connections on hot reload)
 const globalForMongo = globalThis;
 const client =
@@ -117,6 +116,30 @@ export const auth = betterAuth({
         },
       },
     },
+  },
+
+    hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      // Server-side password rules for sign up
+      if (ctx.path !== "/sign-up/email") return;
+
+      const password = ctx.body?.password;
+      if (typeof password !== "string" || password.length < 6) {
+        throw new APIError("BAD_REQUEST", {
+          message: "Password must be at least 6 characters",
+        });
+      }
+      if (!/[A-Z]/.test(password)) {
+        throw new APIError("BAD_REQUEST", {
+          message: "Password must contain at least one uppercase letter",
+        });
+      }
+      if (!/[a-z]/.test(password)) {
+        throw new APIError("BAD_REQUEST", {
+          message: "Password must contain at least one lowercase letter",
+        });
+      }
+    }),
   },
 
   plugins: [jwt(), nextCookies()], // nextCookies must stay last
