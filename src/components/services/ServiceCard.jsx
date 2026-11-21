@@ -61,7 +61,7 @@ export default function ServiceCard({ service }) {
         <Button
           className="w-full"
           nativeButton={false}
-          render={<Link href={`/services/${service._id}`} />}
+          render={<Link href={`/services/${service?._id}`} />}
         >
           View Details
         </Button>

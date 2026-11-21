@@ -4,9 +4,9 @@ WedPlan is a full-stack wedding planning platform that connects customers with w
 
 This repository contains the Next.js client application.
 
-## Live Website
+## Live Website : https://wedplan-clientt.vercel.app/
 
-Live deployment: **Add the production client URL here**
+Live deployment: **https://wedplan-clientt.vercel.app/**
 
 ## Repositories
 
@@ -125,7 +125,7 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 IMGBB_API_KEY=your_imgbb_api_key
 
-NEXT_PUBLIC_API_URL=https://wedplan-server.onrender.com
+NEXT_PUBLIC_API_URL=https://wedplan-server-six.vercel.app
 ```
 
 Variable descriptions:
