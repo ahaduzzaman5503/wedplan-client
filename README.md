@@ -125,7 +125,7 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 IMGBB_API_KEY=your_imgbb_api_key
 
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=https://wedplan-server.onrender.com
 ```
 
 Variable descriptions:
