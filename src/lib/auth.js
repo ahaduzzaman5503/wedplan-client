@@ -6,27 +6,43 @@ import { MongoClient, ObjectId } from "mongodb";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { attachDatabasePool } from "@vercel/functions";
 
-// Reuse ONE Mongo client in every environment (dev and production).
+// Reuse ONE Mongo client per server instance, in every environment.
 // Never call client.close() anywhere in the app.
 const globalForMongo = globalThis;
 
 if (!globalForMongo._wedplanMongoClient) {
-  globalForMongo._wedplanMongoClient = new MongoClient(process.env.MONGODB_URI);
-  attachDatabasePool(globalForMongo._wedplanMongoClient);
+  const mongoClient = new MongoClient(process.env.MONGODB_URI, {
+    maxPoolSize: 5,
+    serverSelectionTimeoutMS: 10000,
+  });
+
+  // Log the real reason when the connection has trouble.
+  // These lines appear in Vercel's Runtime Logs and start with "[mongo]".
+  mongoClient.on("serverHeartbeatFailed", (event) => {
+    console.error("[mongo] heartbeat failed:", event?.failure?.message);
+  });
+  mongoClient.on("topologyClosed", () => {
+    console.error("[mongo] topology closed for the auth client");
+  });
+
+  attachDatabasePool(mongoClient); // lets Vercel manage the pool when the function suspends and resumes
+  globalForMongo._wedplanMongoClient = mongoClient;
 }
 
 const client = globalForMongo._wedplanMongoClient;
 const db = client.db(process.env.MONGODB_DB);
-const isProduction = process.env.NODE_ENV === "production";
+
+// Secure cookies only when the site really runs on https
+const isHttps = (process.env.BETTER_AUTH_URL || "").startsWith("https://");
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, { client }),
 
   advanced: {
-    useSecureCookies: isProduction,
+    useSecureCookies: isHttps,
     defaultCookieAttributes: {
       httpOnly: true,
-      secure: isProduction,
+      secure: isHttps,
       sameSite: "lax",
       path: "/",
     },
