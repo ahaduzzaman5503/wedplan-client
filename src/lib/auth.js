@@ -4,13 +4,18 @@ import { jwt } from "better-auth/plugins";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { MongoClient, ObjectId } from "mongodb";
 import { APIError, createAuthMiddleware } from "better-auth/api";
-// Reuse one Mongo client while developing (avoids many connections on hot reload)
+import { attachDatabasePool } from "@vercel/functions";
+
+// Reuse ONE Mongo client in every environment (dev and production).
+// Never call client.close() anywhere in the app.
 const globalForMongo = globalThis;
-const client =
-  globalForMongo._wedplanMongoClient ?? new MongoClient(process.env.MONGODB_URI);
-if (process.env.NODE_ENV !== "production") {
-  globalForMongo._wedplanMongoClient = client;
+
+if (!globalForMongo._wedplanMongoClient) {
+  globalForMongo._wedplanMongoClient = new MongoClient(process.env.MONGODB_URI);
+  attachDatabasePool(globalForMongo._wedplanMongoClient);
 }
+
+const client = globalForMongo._wedplanMongoClient;
 const db = client.db(process.env.MONGODB_DB);
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -118,7 +123,7 @@ export const auth = betterAuth({
     },
   },
 
-    hooks: {
+  hooks: {
     before: createAuthMiddleware(async (ctx) => {
       // Server-side password rules for sign up
       if (ctx.path !== "/sign-up/email") return;
@@ -144,4 +149,6 @@ export const auth = betterAuth({
 
   plugins: [jwt(), nextCookies()], // nextCookies must stay last
 });
+
+
 

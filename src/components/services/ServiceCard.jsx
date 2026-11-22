@@ -11,8 +11,7 @@ export default function ServiceCard({ service }) {
 
   return (
     <Card className="flex h-full flex-col gap-0 overflow-hidden py-0 transition-shadow hover:shadow-lg">
-      <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+    <div className="w-full aspect-4/3 overflow-hidden bg-muted">        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={service.images?.[0]}
           alt={service.serviceName}

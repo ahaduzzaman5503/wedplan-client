@@ -33,7 +33,9 @@ const statusStyles = {
 
 function PaymentBadge({ status }) {
   return (
-    <Badge className={`capitalize ${statusStyles[status] ?? "bg-gray-200 text-gray-700"}`}>
+    <Badge
+      className={`capitalize ${statusStyles[status] ?? "bg-gray-200 text-gray-700"}`}
+    >
       {status}
     </Badge>
   );
